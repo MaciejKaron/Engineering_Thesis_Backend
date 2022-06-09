@@ -23,10 +23,10 @@ exports.createTournament = (req, res) => {
     })
     //Save tournament
     tournament.save(tournament).then(
-        data => {
+        (data) => {
             res.send(data)
         }
-    ).catch(err => {
+    ).catch((err) => {
         res.status(500).send({
             message: err.message || "error while creating the tournament"
         })
