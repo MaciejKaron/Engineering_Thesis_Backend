@@ -10,6 +10,7 @@ exports.signup = (req, res) => {
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
+    vip: req.body.vip ? req.body.vip : false,
   });
 
   user.save((err, user) => {
@@ -100,9 +101,10 @@ exports.signin = (req, res) => {
         authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
       }
       res.status(200).send({
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email,
+        vip: user.vip,
         roles: authorities,
         accessToken: token,
         refreshToken: refreshToken,

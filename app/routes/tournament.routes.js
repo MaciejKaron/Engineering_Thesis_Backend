@@ -21,4 +21,8 @@ module.exports = function (app) {
     app.delete("/api/tournaments/:id", controller.deleteTournament)
 
     app.delete("/api/tournaments/delete/all", controller.deleteAllTournaments)
+
+    app.post("/api/tournaments/join/:id", controller.addUserToTournament)
+
+    app.post("/api/tournaments/rejoin/:id", controller.leaveUserFromTournament)
 }

@@ -1,4 +1,5 @@
 const db = require('../models')
+const User = require('../models/user.model')
 const Tournament = db.tournaments
 
 const getPagination = (page, size) => {
@@ -7,7 +8,6 @@ const getPagination = (page, size) => {
 
     return { limit, offset}
 }
-
 //Create and Save a new tournament
 exports.createTournament = (req, res) => {
 //Validate request
@@ -19,7 +19,11 @@ exports.createTournament = (req, res) => {
     const tournament = new Tournament({
         title: req.body.title,
         description: req.body.description,
-        published: req.body.published ? req.body.published : false
+        mode: req.body.mode,
+        published: req.body.published ? req.body.published : false,
+        premium: req.body.premium ? req.body.premium : false,
+        startTime: req.body.startTime,
+        players: req.body.players,
     })
     //Save tournament
     tournament.save(tournament).then(
@@ -148,4 +152,53 @@ exports.findAllPublishedTournaments = (req, res) => {
           err.message || "Some error occurred while retrieving tutorials."
       });
     });
+}
+
+exports.addUserToTournament = (req, res) => {
+    Tournament.findById(req.params.id)
+    .then((tournament) => {
+        if (tournament.players.includes(req.body._id)) {
+            // console.log(req.params.id)
+            // console.log(req.body)
+        return res.status(400).send({ msg: "This user already signed up for this tournament" });
+        }
+        else {
+             if (tournament.premium == true) {
+                 User.findById(req.body._id)
+                     .then((user) => {
+                        //  console.log(user)
+                         if (user.vip == false) {
+                            //  console.log(user.vip) 
+                             return res.status(400).send({ msg: "This user dont have premium" });
+                         } else {
+                            tournament.players.push(req.body._id);
+                            // console.log(req.params.id)
+                            // console.log(req.body)
+                        return tournament.save();  
+                         } 
+                 })
+             } else {
+                tournament.players.push(req.body._id);
+                // console.log(req.params.id)
+                // console.log(req.body)
+            return tournament.save();
+         }
+           
+        }
+    })
+        .catch((err) => res.status(500).json(err));
+}
+
+exports.leaveUserFromTournament = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            if (tournament.players.includes(req.body._id)) {
+                tournament.players.pop(req.body._id)
+                return tournament.save();
+            } else {
+                return res.status(400).send({ msg: "This user is not registered for this tournament"})
+        }
+        })
+        // .then((savedTournament) => res.json(savedTournament))
+    .catch((err) => res.status(500).json(err))
 }
