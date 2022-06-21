@@ -6,6 +6,24 @@ const User = mongoose.model("User",
         password: String,
         email: String,
         vip: Boolean,
+        invitations: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
+        pendingFriends: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
+        friends: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
         roles: [
             {
                 type: mongoose.Schema.Types.ObjectId,

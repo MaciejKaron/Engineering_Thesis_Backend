@@ -18,4 +18,9 @@ module.exports = function (app) {
     app.get('/api/user/:id', controller.findOneUser)
     app.get('/api/user/find/all', controller.findAllUsers)
     app.put('/api/user/:id', controller.updateUser)
+    app.post('/api/user/friend/:id', controller.addToPending)
+    app.post('/api/user/unfriend/:id', controller.removeFromFriends)
+    app.post('/api/user/remove/:id', controller.removeFromPending)
+    app.post('/api/user/accept/:id', controller.confirmTheInvitation)
+    app.post('/api/user/decline/:id', controller.declineTheInvitation)
 }

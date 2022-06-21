@@ -11,6 +11,9 @@ exports.signup = (req, res) => {
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
     vip: req.body.vip ? req.body.vip : false,
+    pendingFriends: req.body.pendingFriends,
+    invitations: req.body.invitations,
+    friends: req.body.friends
   });
 
   user.save((err, user) => {
@@ -105,6 +108,9 @@ exports.signin = (req, res) => {
         username: user.username,
         email: user.email,
         vip: user.vip,
+        pendingFriends: user.pendingFriends,
+        invitations: user.invitations,
+        friends: user.friends,
         roles: authorities,
         accessToken: token,
         refreshToken: refreshToken,

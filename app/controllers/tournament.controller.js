@@ -58,6 +58,28 @@ exports.findAllTournaments = (req, res) => {
     })
 }
 
+//Get only published tournaments
+exports.findAllPublishedTournaments = (req, res) => {
+    const { page, size, title } = req.query
+    var condition = title ? { title: { $regex: new RegExp(title), $options: "i" } } : {}  && {published: true}
+    const {limit, offset} = getPagination(page, size)
+    Tournament.paginate(condition, {offset, limit})
+    .then(data => {
+        res.send({
+            totalItems: data.totalDocs,
+            tournaments: data.docs,
+            totalPages: data.totalPages,
+            currentPage: data.page -1,
+      });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
+      });
+    });
+}
+
 //Get a single tournament by id
 exports.findOneTournament = (req, res) => {
     const id = req.params.id
@@ -133,27 +155,6 @@ exports.deleteAllTournaments = (req, res) => {
 }
 
 
-//Get only published tournaments
-exports.findAllPublishedTournaments = (req, res) => {
-    const { page, size } = req.query
-    const {limit, offset} = getPagination(page, size)
-    Tournament.paginate({ published: true }, {offset, limit})
-    .then(data => {
-        res.send({
-            totalItems: data.totalDocs,
-            tournaments: data.docs,
-            totalPages: data.totalPages,
-            currentPage: data.page -1,
-      });
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving tutorials."
-      });
-    });
-}
-
 exports.addUserToTournament = (req, res) => {
     Tournament.findById(req.params.id)
     .then((tournament) => {
@@ -163,6 +164,11 @@ exports.addUserToTournament = (req, res) => {
         return res.status(400).send({ msg: "This user already signed up for this tournament" });
         }
         else {
+            let currentTime = new Date()
+            if (currentTime > tournament.startTime) {
+                // console.log(currentTime)
+                return res.status(400).send({ msg: "This tournament has already started" });
+            }
              if (tournament.premium == true) {
                  User.findById(req.body._id)
                      .then((user) => {

@@ -53,8 +53,8 @@ exports.findOneUser = (req, res) => {
 }
 
 exports.findAllUsers = (req, res) => {
-    const id = req.query.id
-    var condition = id ? { id: { $regex: new RegExp(id), $options: "i" } } : {}
+    const {username} = req.query
+    var condition =  username ? { username: { $regex: new RegExp(username), $options: "i" } } : {}
     User.find(condition)
         .then(data => {
         res.send(data)
@@ -83,4 +83,133 @@ exports.updateUser = (req, res) => {
         .catch(err => {
         res.status(500).send({message: "Error updating user with id= "+id})
     })
+}
+
+exports.addToPending = (req, res) => {
+    if (req.body._id !== req.params.id) {
+        try {
+            User.findById(req.params.id)
+                .then((user) => {
+                    // console.log(user)
+                    User.findById(req.body._id)
+                        .then((currentUser) => {
+                            // console.log(currentUser)
+            if (!user.invitations.includes(req.body._id)) { //jeśli user2 nie dostał od usera1 wcześniej zaproszenia
+                user.invitations.push(req.body._id)
+                currentUser.pendingFriends.push(req.params.id)
+                res.status(200).send("An invitation was send. User has been added to pending")
+                return user.save() && currentUser.save()
+            } else {
+                res.status(403).send("You allready added this user")
+                            }
+                        })
+                })
+        } catch (err) {
+            res.status(500).send(err)
+        }
+    } else {
+        res.status(403).send("You cant add yourself")
+    }
+}
+
+exports.removeFromPending = (req, res) => {
+    if (req.body._id !== req.params.id) {
+        try {
+            User.findById(req.params.id)
+                .then((user) => {
+                    User.findById(req.body._id)
+                    .then((currentUser) => {
+                        if (user.invitations.includes(req.body._id)) {
+                            user.invitations.pull(req.body_id)
+                            currentUser.pendingFriends.pull(req.params.id)
+                            res.status(200).send("The invitation was canceled")
+                            return user.save() && currentUser.save()
+                        } else {
+                            res.status(403).send("The invitation has not been sent")
+                    }
+                })
+            })
+        } catch (err) {
+            res.status(500).send(err)
+        }
+    } else {
+        res.status(403).send("You cant remove yourself")
+    }
+}
+
+exports.confirmTheInvitation = (req, res) => {
+    if (req.body._id !== req.params.id) {
+        try {
+            User.findById(req.params.id)
+                .then((user) => {
+                    User.findById(req.body._id)
+                        .then((currentUser) => {
+                            if (currentUser.invitations.includes(req.params.id)) {
+                                currentUser.invitations.pull(req.params.id)
+                                currentUser.friends.push(req.params.id)
+                                user.pendingFriends.pull(req.body._id)
+                                user.friends.push(req.body._id)
+                                res.status(200).send("Accepted as a friend")
+                                return user.save() && currentUser.save()
+                            } else {
+                                res.status(403).send("Nobody like that invited you to be friends")
+                        }
+                    })
+            })
+        } catch (err) {
+            res.status(500).send(err)
+        }
+    } else {
+        res.status(403).send("You cant accept yourself")
+    }
+}
+
+exports.declineTheInvitation = (req, res) => {
+    if (req.body._id !== req.params.id) {
+        try {
+            User.findById(req.params.id)
+                .then((user) => {
+                    User.findById(req.body._id)
+                    .then((currentUser) => {
+                        if (currentUser.invitations.includes(req.params.id)) {
+                            currentUser.invitations.pull(req.params.id)
+                            user.pendingFriends.pull(req.body._id)
+                            res.status(200).send("The invitation was canceled")
+                            return user.save() && currentUser.save()
+                        } else {
+                            res.status(403).send("The invitation has not been sent")
+                    }
+                })
+            })
+        } catch (err) {
+            res.status(500).send(err)
+        }
+    } else {
+        res.status(403).send("You cant remove yourself")
+    }
+}
+
+exports.removeFromFriends = (req, res) => {
+    if (req.body._id !== req.params.id) {
+        try {
+            User.findById(req.params.id)
+                .then((user) => {
+                    User.findById(req.body._id)
+                        .then((currentUser) => {
+                            if (user.friends.includes(req.body._id)) {
+                                user.friends.pull(req.body._id)
+                                currentUser.friends.pull(req.params.id)
+                                res.status(200).send("Successfully removed from friends")
+                                return user.save() && currentUser.save()
+                            } else {
+                                res.status(403).send("Its not your friend")  
+                        }
+                    })
+            })
+        } catch (err) {
+            res.status(500).send(err)
+        }
+    } else {
+        res.status(403).send("You cant remove yourself from friends")
+    }
 }
