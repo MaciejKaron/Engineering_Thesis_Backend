@@ -6,6 +6,13 @@ const User = mongoose.model("User",
         password: String,
         email: String,
         vip: Boolean,
+        team: [
+            {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Team"
+            }
+        ],
+        isInTeam: Boolean,
         invitations: [
             {
                 type: mongoose.Schema.Types.ObjectId,

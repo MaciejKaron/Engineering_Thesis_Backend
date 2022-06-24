@@ -93,14 +93,18 @@ exports.addToPending = (req, res) => {
                     // console.log(user)
                     User.findById(req.body._id)
                         .then((currentUser) => {
-                            // console.log(currentUser)
-            if (!user.invitations.includes(req.body._id)) { //jeśli user2 nie dostał od usera1 wcześniej zaproszenia
-                user.invitations.push(req.body._id)
-                currentUser.pendingFriends.push(req.params.id)
-                res.status(200).send("An invitation was send. User has been added to pending")
-                return user.save() && currentUser.save()
-            } else {
-                res.status(403).send("You allready added this user")
+                            if (!currentUser.friends.includes(req.params.id)) { //jeśli nie ma w u2 w znajomych
+                                // console.log(currentUser)
+                                if (!user.invitations.includes(req.body._id)) { //jeśli user2 nie dostał od usera1 wcześniej zaproszenia
+                                    user.invitations.push(req.body._id)
+                                    currentUser.pendingFriends.push(req.params.id)
+                                    res.status(200).send("An invitation was send. User has been added to pending")
+                                    return user.save() && currentUser.save()
+                                } else {
+                                    res.status(403).send("You allready send invitation this user")
+                                }
+                            } else {
+                                res.status(403).send("You allready have this user in friends")
                             }
                         })
                 })
@@ -120,7 +124,7 @@ exports.removeFromPending = (req, res) => {
                     User.findById(req.body._id)
                     .then((currentUser) => {
                         if (user.invitations.includes(req.body._id)) {
-                            user.invitations.pull(req.body_id)
+                            user.invitations.pull(req.body._id)
                             currentUser.pendingFriends.pull(req.params.id)
                             res.status(200).send("The invitation was canceled")
                             return user.save() && currentUser.save()

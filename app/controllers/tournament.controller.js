@@ -166,7 +166,8 @@ exports.addUserToTournament = (req, res) => {
         else {
             let currentTime = new Date()
             if (currentTime > tournament.startTime) {
-                // console.log(currentTime)
+                console.log(currentTime)
+                console.log(tournament.startTime)
                 return res.status(400).send({ msg: "This tournament has already started" });
             }
              if (tournament.premium == true) {
@@ -180,6 +181,7 @@ exports.addUserToTournament = (req, res) => {
                             tournament.players.push(req.body._id);
                             // console.log(req.params.id)
                             // console.log(req.body)
+                             res.status(200).send({msg: "Joined the tournament"})
                         return tournament.save();  
                          } 
                  })
@@ -187,6 +189,7 @@ exports.addUserToTournament = (req, res) => {
                 tournament.players.push(req.body._id);
                 // console.log(req.params.id)
                 // console.log(req.body)
+                res.status(200).send({msg: "Joined the tournament"})
             return tournament.save();
          }
            
@@ -199,7 +202,8 @@ exports.leaveUserFromTournament = (req, res) => {
     Tournament.findById(req.params.id)
         .then((tournament) => {
             if (tournament.players.includes(req.body._id)) {
-                tournament.players.pop(req.body._id)
+                tournament.players.pull(req.body._id)
+                res.status(200).send({msg: "Leaved the tournament"})
                 return tournament.save();
             } else {
                 return res.status(400).send({ msg: "This user is not registered for this tournament"})
