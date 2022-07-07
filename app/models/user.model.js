@@ -13,6 +13,12 @@ const User = mongoose.model("User",
             }
         ],
         isInTeam: Boolean,
+        teamInvitations: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Team"
+            }
+        ],
         invitations: [
             {
                 type: mongoose.Schema.Types.ObjectId,

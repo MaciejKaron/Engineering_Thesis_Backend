@@ -11,6 +11,8 @@ db.ROLES = ["user", "moderator", "admin"]
 db.tournaments = require('./tournament.model')(mongoose, mongoosePaginate)
 db.refreshToken = require('./refreshToken.model')
 db.team = require('./team.model')
+db.conversation = require('./conversation.model')
+db.message = require('./message.model')
 
 module.exports = db
 

@@ -8,6 +8,7 @@ exports.createTeam = (req, res) => {
         tag: req.body.tag,
         owner: req.body.owner,
         players: req.body.players,
+        pendingPlayers: req.body.pendingPlayers,
     })
     team.save(team).then(
         (data) => {
@@ -94,5 +95,34 @@ exports.deleteAllTeams = (req, res) => {
             message: err.message || "Error while removing all teams"
         })
     })
+}
+
+exports.addToPending = (req, res) => {
+        try {
+            User.findById(req.params.id)
+                .then((user) => {
+                    Team.findById(req.body._id)
+                        .then((currentTeam) => {
+                            if (currentTeam.owner.toString() !== req.params.id) { // jeśli id usera to nie id założyciela teamu 
+                            if (!currentTeam.players.includes(req.params.id)) { //jeśli nie ma usera w graczach
+                                if (!user.teamInvitations.includes(req.body._id)) { //jeśli user nie dostał wcześniej zaproszenia do teamu
+                                    user.teamInvitations.push(req.body._id)
+                                    currentTeam.pendingPlayers.push(req.params.id)
+                                    res.status(200).send("An invitation was send. User has been added to pending") 
+                                    return user.save() && currentTeam.save()
+                                } else {
+                                    res.status(403).send("You allready send invitation to this user")
+                                }
+                            } else {
+                                res.status(403).send("You allready have this user in team")
+                                }
+                            } else {
+                                res.status(403).send("You can't add yourself")
+                            }
+                    })
+            })
+        } catch (err) {
+            res.status(500).send(err)
+        }
 }
 

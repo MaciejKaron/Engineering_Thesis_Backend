@@ -14,6 +14,12 @@ const Team = mongoose.model("Team",
                 ref: "User"
             }
         ],
+        pendingPlayers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
     })
 )
 

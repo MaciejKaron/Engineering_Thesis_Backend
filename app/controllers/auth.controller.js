@@ -13,6 +13,7 @@ exports.signup = (req, res) => {
     vip: req.body.vip ? req.body.vip : false,
     team: req.body.team,
     isInTeam: req.body.isInTeam ? req.body.isInTeam : false,
+    teamInvitations: req.body.teamInvitations,
     pendingFriends: req.body.pendingFriends,
     invitations: req.body.invitations,
     friends: req.body.friends
@@ -112,6 +113,7 @@ exports.signin = (req, res) => {
         vip: user.vip,
         team: user.team,
         isInTeam: user.isInTeam,
+        teamInvitations: user.teamInvitations,
         pendingFriends: user.pendingFriends,
         invitations: user.invitations,
         friends: user.friends,

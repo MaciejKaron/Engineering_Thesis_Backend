@@ -35,6 +35,9 @@ require('./app/routes/auth.routes')(app)
 require('./app/routes/user.routes')(app)
 require('./app/routes/tournament.routes')(app)
 require('./app/routes/team.routes')(app)
+require('./app/routes/conversation.routes')(app)
+require('./app/routes/message.routes')(app)
+
 
 //set PORT
 const PORT = process.env.PORT || 8080

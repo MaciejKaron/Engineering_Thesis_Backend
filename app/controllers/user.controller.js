@@ -52,6 +52,50 @@ exports.findOneUser = (req, res) => {
     })
 }
 
+exports.findOneUserByUsername = (req, res) => {
+    const username = req.params.id
+    User.findOne({username: new RegExp('^'+username+'$', "i")})
+    .then(data => {
+        if (!data) {
+        res.status(404).send({ message: "Not found user with username=" + username})
+        } else {
+            res.send(data)
+    }
+    })
+    .catch(err => {
+    res.status(500).send({message: "Error while finding user with username=" + username})
+})
+}
+
+// return ["user1","user2","user3"]
+exports.findOneUserAndFriends = (req, res) => {
+    const id = req.params.id
+    User.findById(id)
+        .then(data => {
+            if (!data) {
+            res.status(404).send({ message: "Not found user with id" + id})
+            } else {
+                const length = data.friends.length
+                var names = []
+                for (i = 0; i < length; i++){
+                    User.findById(data.friends[i])
+                        .then(data2 => {
+                            names.push(data2.username)
+                        })
+                }
+                User.findById(id)
+                    .then(doNothink => {
+                        res.send(names)
+                }) 
+        }
+        })
+        .catch(err => {
+        res.status(500).send({message: "Error while finding user with id=" + id})
+    })
+}
+
+
+
 exports.findAllUsers = (req, res) => {
     const {username} = req.query
     var condition =  username ? { username: { $regex: new RegExp(username), $options: "i" } } : {}
