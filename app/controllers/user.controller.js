@@ -67,7 +67,7 @@ exports.findOneUserByUsername = (req, res) => {
 })
 }
 
-// return ["user1","user2","user3"]
+// return ["user1","user2","user3" + ids]
 exports.findOneUserAndFriends = (req, res) => {
     const id = req.params.id
     User.findById(id)
@@ -80,7 +80,8 @@ exports.findOneUserAndFriends = (req, res) => {
                 for (i = 0; i < length; i++){
                     User.findById(data.friends[i])
                         .then(data2 => {
-                            names.push(data2.username)
+                            const { _id, username} = data2
+                            names.push({ _id, username })
                         })
                 }
                 User.findById(id)

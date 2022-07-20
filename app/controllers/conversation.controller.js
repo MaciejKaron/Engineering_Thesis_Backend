@@ -1,3 +1,4 @@
+const { response } = require('express')
 const db = require('../models')
 const Conversation = db.conversation
 
@@ -5,19 +6,27 @@ exports.createConversation = (req, res) => {
     const conversation = new Conversation({
         members: [req.body.senderId, req.body.receiverId],
     })
-    try {
-        conversation.save(conversation).then(
-            (data) => {
-                res.send(data)
-            }
-        ).catch((err) => {
-            res.status(500).send({
-                message: err.message || "error while creating conversation"
+    //if this conversation already exist
+    Conversation.findOne({ members: { $all: [req.body.senderId, req.body.receiverId] } })
+        .then(response => {
+    if (!response) {
+        try {
+            conversation.save(conversation).then(
+                (data) => {
+                    res.send(data)
+                }
+            ).catch((err) => {
+                res.status(500).send({
+                    message: err.message || "error while creating conversation"
+                })
             })
+        } catch (err) {
+            res.status(500).send(err)
+        }
+    } else {
+        res.status(403).send("You allready have conversation with this user")
+            }
         })
-    } catch (err) {
-        res.status(500).send(err)
-    }
 }
 
 //get conversations by user Id
