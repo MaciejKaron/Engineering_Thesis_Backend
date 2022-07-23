@@ -35,6 +35,10 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome in my app!" })
 })
 
+app.get("/cipajebanazżółkłacipa", (req, res) => {
+    res.json({ message: "Zżółkła cipa" })
+})
+
 require('./app/routes/auth.routes')(app)
 require('./app/routes/user.routes')(app)
 require('./app/routes/tournament.routes')(app)
