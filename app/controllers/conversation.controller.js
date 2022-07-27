@@ -24,7 +24,7 @@ exports.createConversation = (req, res) => {
             res.status(500).send(err)
         }
     } else {
-        res.status(403).send("You allready have conversation with this user")
+        res.status(200).send("You allready have conversation with this user")
             }
         })
 }
