@@ -17,4 +17,9 @@ module.exports = function (app) {
     app.delete('/api/team/delete/all', controller.deleteAllTeams)
 
     app.post('/api/team/add/:id', controller.addToPending)
+    app.post('/api/team/cancel/:id', controller.removeFromPending)
+    app.post('/api/team/accept/:id', controller.confirmTeamInvitation)
+    app.post('/api/team/decline/:id', controller.declineTeamInvitation)
+    app.post('/api/team/remove/:id', controller.removeFromTeam)
+    app.post('/api/team/leave/:id', controller.leaveTeam)
 }

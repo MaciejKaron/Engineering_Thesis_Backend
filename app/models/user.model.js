@@ -13,6 +13,7 @@ const User = mongoose.model("User",
             }
         ],
         isInTeam: Boolean,
+        teamInviteSend: Boolean,
         teamInvitations: [
             {
                 type: mongoose.Schema.Types.ObjectId,

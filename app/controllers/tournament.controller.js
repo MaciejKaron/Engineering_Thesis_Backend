@@ -166,8 +166,8 @@ exports.addUserToTournament = (req, res) => {
         else {
             let currentTime = new Date()
             if (currentTime > tournament.startTime) {
-                console.log(currentTime)
-                console.log(tournament.startTime)
+                // console.log(currentTime)
+                // console.log(tournament.startTime)
                 return res.status(400).send({ msg: "This tournament has already started" });
             }
              if (tournament.premium == true) {

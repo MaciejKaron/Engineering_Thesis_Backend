@@ -85,7 +85,36 @@ io.on("connection", (socket) => {
         } else {
             console.log('This user is offline')
         }
-    })     
+    })
+    
+//send and get invite
+    socket.on("sendInvite", ({ receiverId, senderId, teamId ,deleteInvite }) => {
+        const user = getUser(receiverId)
+        if (user !== undefined) {
+            io.to(user.socketId).emit("getInvite", {
+                senderId: senderId,
+                teamId: teamId,
+                deleteInvite: deleteInvite
+            })
+        } else {
+            console.log('This user is offline')
+        }
+    })
+
+//update parameters (Invitation to Team)
+    socket.on("sendInfo", ({ receiverId, teamInviteSend, isInTeam, newPlayer, leaver }) => {
+        const user = getUser(receiverId)
+        if (user !== undefined) {
+            io.to(user.socketId).emit("getInfo", {
+                teamInviteSend: teamInviteSend,
+                isInTeam: isInTeam,
+                newPlayer: newPlayer,
+                leaver: leaver
+            })
+        } else {
+            console.log('This user is offline')
+        }
+    })
 
 //when disconnected
     socket.on("disconnect", () => {
