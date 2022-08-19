@@ -112,6 +112,19 @@ exports.findAllUsers = (req, res) => {
     })
 }
 
+exports.getAllUsers = (req, res) => {
+    User.find({})
+        .then(data => {
+        res.send(data)
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                err.message || "Some error while finding all users"
+        })
+    })
+}
+
 exports.updateUser = (req, res) => {
     if (!req.body) {
         return res.status(400).send({message: "Data to update can't be empty"})

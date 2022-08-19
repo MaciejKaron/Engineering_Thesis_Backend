@@ -1,4 +1,5 @@
 const db = require('../models')
+const Team = require('../models/team.model')
 const User = require('../models/user.model')
 const Tournament = db.tournaments
 
@@ -24,6 +25,7 @@ exports.createTournament = (req, res) => {
         premium: req.body.premium ? req.body.premium : false,
         startTime: req.body.startTime,
         players: req.body.players,
+        teams: req.body.teams,
     })
     //Save tournament
     tournament.save(tournament).then(
@@ -161,14 +163,14 @@ exports.addUserToTournament = (req, res) => {
         if (tournament.players.includes(req.body._id)) {
             // console.log(req.params.id)
             // console.log(req.body)
-        return res.status(400).send({ msg: "This user already signed up for this tournament" });
+        return res.status(403).send({ msg: "This user already signed up for this tournament" });
         }
         else {
             let currentTime = new Date()
             if (currentTime > tournament.startTime) {
                 // console.log(currentTime)
                 // console.log(tournament.startTime)
-                return res.status(400).send({ msg: "This tournament has already started" });
+                return res.status(403).send({ msg: "This tournament has already started" });
             }
              if (tournament.premium == true) {
                  User.findById(req.body._id)
@@ -176,7 +178,7 @@ exports.addUserToTournament = (req, res) => {
                         //  console.log(user)
                          if (user.vip == false) {
                             //  console.log(user.vip) 
-                             return res.status(400).send({ msg: "This user dont have premium" });
+                             return res.status(403).send({ msg: "This user dont have premium" });
                          } else {
                             tournament.players.push(req.body._id);
                             // console.log(req.params.id)
@@ -206,9 +208,60 @@ exports.leaveUserFromTournament = (req, res) => {
                 res.status(200).send({msg: "Leaved the tournament"})
                 return tournament.save();
             } else {
-                return res.status(400).send({ msg: "This user is not registered for this tournament"})
+                return res.status(403).send({ msg: "This user is not registered for this tournament"})
         }
         })
         // .then((savedTournament) => res.json(savedTournament))
+    .catch((err) => res.status(500).json(err))
+}
+
+exports.addTeamToTournament = (req, res) => {
+    Tournament.findById(req.params.id)
+    .then((tournament) => {
+        if (tournament.teams.includes(req.body._id)) {
+        return res.status(403).send({ msg: "This team already signed up for this tournament" });
+        }
+        else {
+            let currentTime = new Date()
+            if (currentTime > tournament.startTime) {
+                return res.status(403).send({ msg: "This tournament has already started" });
+            }
+            if (tournament.premium == true) {
+                Team.findById(req.body._id)
+                    .then((team) => {
+                    
+                User.findById(team.owner)
+                     .then((user) => {
+                         if (user.vip == false) { 
+                             return res.status(403).send({ msg: "This team leader dont have premium" });
+                         } else {
+                            tournament.teams.push(req.body._id);
+                             res.status(200).send({msg: "Joined the tournament"})
+                        return tournament.save();  
+                         } 
+                     })
+                    })
+             } else {
+                tournament.teams.push(req.body._id);
+                res.status(200).send({msg: "Joined the tournament"})
+            return tournament.save();
+         }
+           
+        }
+    })
+        .catch((err) => res.status(500).json(err));
+}
+
+exports.leaveTeamFromTournament = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            if (tournament.teams.includes(req.body._id)) {
+                tournament.teams.pull(req.body._id)
+                res.status(200).send({msg: "Leaved the tournament"})
+                return tournament.save();
+            } else {
+                return res.status(403).send({ msg: "This team is not registered for this tournament"})
+        }
+        })
     .catch((err) => res.status(500).json(err))
 }

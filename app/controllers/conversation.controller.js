@@ -35,7 +35,7 @@ exports.getConversation = (req, res) => {
         Conversation.find({ members: { $in: [req.params.id] } })
             .then(data => {
                 if (!data) {
-                    res.status(404).send({ message: "Not found notification"})
+                    res.status(404).send({ message: "Not found conversation"})
                     } else {
                         res.send(data)
                 }
@@ -51,7 +51,7 @@ exports.getCommonConversation = (req, res) => {
         Conversation.findOne({ members: { $all: [req.params.id1, req.params.id2] } })
             .then(data => {
                 if (!data) {
-                    res.status(404).send({ message: "Not found notification"})
+                    res.status(404).send({ message: "Not found conversation"})
                     } else {
                         res.send(data)
                 }

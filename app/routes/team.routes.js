@@ -13,6 +13,7 @@ module.exports = function (app) {
     app.post('/api/team', controller.createTeam)
     app.get('/api/team/:id', controller.findOneTeam)
     app.get('/api/team/find/all', controller.findAllTeams)
+    app.get('/api/team/get/all', controller.getAllTeams)
     app.delete('/api/team/:id', controller.deleteTeam)
     app.delete('/api/team/delete/all', controller.deleteAllTeams)
 

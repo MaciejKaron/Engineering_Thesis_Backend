@@ -25,4 +25,8 @@ module.exports = function (app) {
     app.post("/api/tournaments/join/:id", controller.addUserToTournament)
 
     app.post("/api/tournaments/rejoin/:id", controller.leaveUserFromTournament)
+
+    app.post("/api/tournaments/joinTeam/:id", controller.addTeamToTournament)
+
+    app.post("/api/tournaments/rejoinTeam/:id", controller.leaveTeamFromTournament)
 }

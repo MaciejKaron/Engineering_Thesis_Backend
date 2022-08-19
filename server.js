@@ -41,6 +41,7 @@ require('./app/routes/tournament.routes')(app)
 require('./app/routes/team.routes')(app)
 require('./app/routes/conversation.routes')(app)
 require('./app/routes/message.routes')(app)
+require('./app/routes/notification.routes')(app)
 
 
 //set PORT
@@ -74,20 +75,22 @@ io.on("connection", (socket) => {
     })
 
 //send and get messages
-    socket.on("sendMessage", ({ senderId, receiverId, text , createdAt}) => {
+    socket.on("sendMessage", ({ senderId, receiverId, text , createdAt, marker, markerId}) => {
         const user = getUser(receiverId)
         if (user !== undefined) {
             io.to(user.socketId).emit("getMessage", {
                 senderId: senderId,
                 text: text,
-                createdAt: createdAt
+                createdAt: createdAt,
+                marker: marker,
+                markerId: markerId
             })
         } else {
             console.log('This user is offline')
         }
     })
     
-//send and get invite
+//send and get invite to team
     socket.on("sendInvite", ({ receiverId, senderId, teamId ,deleteInvite }) => {
         const user = getUser(receiverId)
         if (user !== undefined) {
@@ -102,14 +105,54 @@ io.on("connection", (socket) => {
     })
 
 //update parameters (Invitation to Team)
-    socket.on("sendInfo", ({ receiverId, teamInviteSend, isInTeam, newPlayer, leaver }) => {
+    socket.on("sendInfo", ({ receiverId, teamInviteSend, isInTeam, newPlayer, leaver, deleted }) => {
         const user = getUser(receiverId)
         if (user !== undefined) {
             io.to(user.socketId).emit("getInfo", {
                 teamInviteSend: teamInviteSend,
                 isInTeam: isInTeam,
                 newPlayer: newPlayer,
-                leaver: leaver
+                leaver: leaver,
+                deleted: deleted
+            })
+        } else {
+            console.log('This user is offline')
+        }
+    })
+
+    socket.on("sendFriendsInvite", ({ receiverId, senderId, senderName }) => {
+        const user = getUser(receiverId)
+        if (user !== undefined) {
+            io.to(user.socketId).emit("getFriendsInvite", {
+                senderId: senderId,
+                senderName: senderName
+            })
+        } else {
+            console.log('This user is offline')
+        }
+    })
+
+    socket.on("sendFriendsInfo", ({ receiverId, senderId, sended, accepted, declined, removed, undo }) => {
+        const user = getUser(receiverId)
+        if (user !== undefined) {
+            io.to(user.socketId).emit("getFriendsInfo", {
+                senderId: senderId,
+                sended: sended,
+                accepted: accepted,
+                declined: declined,
+                removed: removed,
+                undo: undo,
+            })
+        } else {
+            console.log('This user is offline')
+        }
+    })
+
+    socket.on("sendNotification", ({ receiverId, marker }) => {
+        const user = getUser(receiverId)
+        if (user !== undefined) {
+            io.to(user.socketId).emit("getNotification", {
+                marker: marker
             })
         } else {
             console.log('This user is offline')

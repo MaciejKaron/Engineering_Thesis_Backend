@@ -1,3 +1,4 @@
+const { user } = require('../models')
 const db = require('../models')
 const Team = db.team
 const User = require('../models/user.model')
@@ -48,6 +49,19 @@ exports.findAllTeams = (req, res) => {
     })
 }
 
+exports.getAllTeams = (req, res) => {
+    Team.find({})
+    .then(data => {
+        res.send(data)
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                err.message || "Some error while finding all users"
+        })
+    })
+}
+
 exports.findOneTeam = (req, res) => {
     const id = req.params.id
     Team.findById(id)
@@ -72,15 +86,25 @@ exports.deleteTeam = (req, res) => {
                 message: "Can't delete team with id= "+id
             })
             } else {
-                User.findById(data.owner)
-                .then((user) => {
-                    user.team.pull(data._id)
-                    return user.save()
-                })
-                User.updateOne({ _id: data.owner }, { $set: { isInTeam: false } })
-                .then((userr) => {
-                })
-                res.send({ message: "Team was deleted successfully"})
+                // User.findById(data.owner)
+                // .then((user) => {
+                //     user.team.pull(data._id)
+                //     return user.save()
+                // })
+                // User.updateOne({ _id: data.owner }, { $set: { isInTeam: false } })
+                // .then((userr) => {
+                // })
+                for (var i = 0; i < data.players.length; i++){
+                    User.findById(data.players[i])
+                        .then((userrr) => {
+                            userrr.team.pull(data._id)
+                            return userrr.save()
+                        })
+                    User.updateOne({ _id: data.players[i] }, { $set: { isInTeam: false } })
+                        .then(() => {
+                        
+                    })
+                }
         }
         })
         .catch(err => {

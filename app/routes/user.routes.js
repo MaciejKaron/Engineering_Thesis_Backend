@@ -19,6 +19,7 @@ module.exports = function (app) {
     app.get('/api/user/find/friends/:id', controller.findOneUserAndFriends)
     app.get('/api/user/username/:id' , controller.findOneUserByUsername)
     app.get('/api/user/find/all', controller.findAllUsers)
+    app.get('/api/user/get/all', controller.getAllUsers)
     app.put('/api/user/:id', controller.updateUser)
     app.post('/api/user/friend/:id', controller.addToPending)
     app.post('/api/user/unfriend/:id', controller.removeFromFriends)

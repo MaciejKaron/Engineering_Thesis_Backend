@@ -13,6 +13,7 @@ db.refreshToken = require('./refreshToken.model')
 db.team = require('./team.model')
 db.conversation = require('./conversation.model')
 db.message = require('./message.model')
+db.notification = require('./notification.model')
 
 module.exports = db
 
