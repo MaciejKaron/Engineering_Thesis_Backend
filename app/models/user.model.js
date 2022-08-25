@@ -43,7 +43,9 @@ const User = mongoose.model("User",
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Role"
             }
-        ]
+        ],
+        faceitNickname: String,
+        faceitVerified: Boolean,
     }))
 
     module.exports = User

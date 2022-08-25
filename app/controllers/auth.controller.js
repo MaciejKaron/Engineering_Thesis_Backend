@@ -17,7 +17,9 @@ exports.signup = (req, res) => {
     teamInvitations: req.body.teamInvitations,
     pendingFriends: req.body.pendingFriends,
     invitations: req.body.invitations,
-    friends: req.body.friends
+    friends: req.body.friends,
+    faceitNickname: req.body.faceitNickname,
+    faceitVerified: req.body.faceitVerified ? req.body.faceitVerified : false,
   });
 
   user.save((err, user) => {
@@ -119,6 +121,8 @@ exports.signin = (req, res) => {
         pendingFriends: user.pendingFriends,
         invitations: user.invitations,
         friends: user.friends,
+        faceitNickname: user.faceitNickname,
+        faceitVerified: user.faceitVerified,
         roles: authorities,
         accessToken: token,
         refreshToken: refreshToken,
