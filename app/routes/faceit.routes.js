@@ -13,4 +13,5 @@ module.exports = function (app) {
     app.post('/api/faceit/all/stats/:id', controller.getMyAllFaceitStats)
     app.get('/api/faceit/stats/find/:id', controller.findOneStats)
     app.get('/api/faceit/verified', controller.getVerifiedUsers)
+    app.get('/api/faceit/ranking', controller.getRankingStats)
 }

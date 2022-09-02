@@ -1,9 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const dbConfig = require("./app/config/db.config")
 const app = express()
 const Faceit = require("faceit-js")
-const api = new Faceit(`6e028b05-fb8c-45dc-8d8e-c60d6e0d8eab`)
+const api = new Faceit(process.env.FACEIT_API_KEY)
 const io = require("socket.io")(8090, {
     cors: {
         origins: ['http://localhost:8081']
@@ -15,7 +16,6 @@ var corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
 const db = require("./app/models")
 const Role = db.role
 
@@ -45,6 +45,7 @@ require('./app/routes/conversation.routes')(app)
 require('./app/routes/message.routes')(app)
 require('./app/routes/notification.routes')(app)
 require('./app/routes/faceit.routes')(app)
+require('./app/routes/payment.routes')(app)
 
 // **** SOCKET.IO ****
 //set PORT
@@ -172,20 +173,7 @@ io.on("connection", (socket) => {
 
 // FACEIT WEB API
 api.account().then(data => console.log("apiKey status:", data));
-// app.post("/faceit/nickname", async (req, res) => {
-//     let user = await api.nickname(req.body.nickname);
-//     if (!user) return res.status(400).send("Could not find Nickname!");
-//     res.status(200).json({ user });
-//   });
 
-// api.nickname("maquuuuuuu").then(data => console.log(data));
-
-// api
-//   .players("9e5c7035-0f5b-4345-8349-8bd542f170d3", "stats", "csgo")
-//   .then(data => console.log(data))
-//   .catch(err => {
-//     console.log(err);
-//   });
 
 // INITIAL FUNCTION
 function initial() {

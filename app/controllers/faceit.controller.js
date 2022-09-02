@@ -3,7 +3,7 @@ const FaceitStats = db.faceitStats
 const User = db.user
 
 const Faceit = require("faceit-js")
-const api = new Faceit(`6e028b05-fb8c-45dc-8d8e-c60d6e0d8eab`)
+const api = new Faceit(process.env.FACEIT_API_KEY)
 
 //user informations from api
 exports.getMyFaceitStats = (req, res) => {
@@ -129,7 +129,49 @@ exports.getVerifiedUsers = (req, res) => {
       .catch(err => {
          res.status(500).send({
              message:
-             err.message || "Some error while finding all users"
+             err.message || "Some error while finding all verified users"
+     })
+ })
+}
+
+exports.getRankingStats = async (req, res) => {
+   User.find({ faceitVerified: true })
+      .then(users => {
+         if (!users) {
+            res.status(404).send({ message: "Not found users" })
+         } else {
+            var usersStats = []
+            for ( i = 0; i < users.length; i++) {
+                let currentUser = api.nickname(users[i].faceitNickname)
+                  .then(userStats => {
+                     if (!currentUser) {
+                        res.status(400).send({ message: "Could not find nickname!" })
+                     } else {
+                        const { nickname = userStats.nickname, skill_level = userStats.games.csgo.skill_level, faceit_elo = userStats.games.csgo.faceit_elo } = userStats
+                        usersStats.push({ nickname, skill_level, faceit_elo })
+                     }
+                  })
+                  .catch(err => {
+                     res.status(500).send({
+                         message:
+                         err.message || "Some error while finding nickname"
+                 })
+             })
+            }
+            api.nickname(users[0].faceitNickname)
+               .then(() => {
+                  setTimeout(function(){ 
+                     console.log("Ready")
+                     res.send(usersStats)
+                  }, 1000);
+               
+            })
+}
+      })
+      .catch(err => {
+         res.status(500).send({
+             message:
+             err.message || "Some error while finding all verified users"
      })
  })
 }

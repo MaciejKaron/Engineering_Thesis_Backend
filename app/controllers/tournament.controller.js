@@ -159,43 +159,46 @@ exports.deleteAllTournaments = (req, res) => {
 
 exports.addUserToTournament = (req, res) => {
     Tournament.findById(req.params.id)
-    .then((tournament) => {
-        if (tournament.players.includes(req.body._id)) {
-            // console.log(req.params.id)
-            // console.log(req.body)
-        return res.status(403).send({ msg: "This user already signed up for this tournament" });
-        }
-        else {
-            let currentTime = new Date()
-            if (currentTime > tournament.startTime) {
-                // console.log(currentTime)
-                // console.log(tournament.startTime)
-                return res.status(403).send({ msg: "This tournament has already started" });
-            }
-             if (tournament.premium == true) {
-                 User.findById(req.body._id)
-                     .then((user) => {
-                        //  console.log(user)
-                         if (user.vip == false) {
-                            //  console.log(user.vip) 
-                             return res.status(403).send({ msg: "This user dont have premium" });
-                         } else {
-                            tournament.players.push(req.body._id);
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (user.faceitVerified == false) {
+                        return res.status(403).send({ msg: "Please bind your account with faceit" })
+                    } else {
+                        if (tournament.players.includes(req.body._id)) {
                             // console.log(req.params.id)
                             // console.log(req.body)
-                             res.status(200).send({msg: "Joined the tournament"})
-                        return tournament.save();  
-                         } 
-                 })
-             } else {
-                tournament.players.push(req.body._id);
-                // console.log(req.params.id)
-                // console.log(req.body)
-                res.status(200).send({msg: "Joined the tournament"})
-            return tournament.save();
-         }
+                            return res.status(403).send({ msg: "This user already signed up for this tournament" });
+                        }
+                        else {
+                            let currentTime = new Date()
+                            if (currentTime > tournament.startTime) {
+                                // console.log(currentTime)
+                                // console.log(tournament.startTime)
+                                return res.status(403).send({ msg: "This tournament has already started" });
+                            }
+                            if (tournament.premium == true) {
+                                if (user.vip == false) {
+                                    //  console.log(user.vip) 
+                                    return res.status(403).send({ msg: "This user dont have premium" });
+                                } else {
+                                    tournament.players.push(req.body._id);
+                                    // console.log(req.params.id)
+                                    // console.log(req.body)
+                                    res.status(200).send({ msg: "Joined the tournament" })
+                                    return tournament.save();
+                                }
+                            } else {
+                                tournament.players.push(req.body._id);
+                                // console.log(req.params.id)
+                                // console.log(req.body)
+                                res.status(200).send({ msg: "Joined the tournament" })
+                                return tournament.save();
+                            }
            
-        }
+                        }
+                    }
+            })
     })
         .catch((err) => res.status(500).json(err));
 }
@@ -217,37 +220,68 @@ exports.leaveUserFromTournament = (req, res) => {
 
 exports.addTeamToTournament = (req, res) => {
     Tournament.findById(req.params.id)
-    .then((tournament) => {
-        if (tournament.teams.includes(req.body._id)) {
-        return res.status(403).send({ msg: "This team already signed up for this tournament" });
-        }
-        else {
-            let currentTime = new Date()
-            if (currentTime > tournament.startTime) {
-                return res.status(403).send({ msg: "This tournament has already started" });
-            }
-            if (tournament.premium == true) {
-                Team.findById(req.body._id)
-                    .then((team) => {
-                    
-                User.findById(team.owner)
-                     .then((user) => {
-                         if (user.vip == false) { 
-                             return res.status(403).send({ msg: "This team leader dont have premium" });
-                         } else {
-                            tournament.teams.push(req.body._id);
-                             res.status(200).send({msg: "Joined the tournament"})
-                        return tournament.save();  
-                         } 
-                     })
-                    })
-             } else {
-                tournament.teams.push(req.body._id);
-                res.status(200).send({msg: "Joined the tournament"})
-            return tournament.save();
-         }
-           
-        }
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+            Team.findById(user.team)
+                .then((team) => {  
+                    if (!team) {
+                        return res.status(403).send({ msg: "You dont have team" })
+                    } else {
+                        if (req.body._id !== team.owner.toString()) {
+                            return res.status(403).send({ msg: "You must be a team leader" })
+                        } else {
+                            if (tournament.teams.includes(user.team.toString())) {
+                                return res.status(403).send({ msg: "This team already signed up for this tournament" });
+                            }
+                            else {
+                                let currentTime = new Date()
+                                if (currentTime > tournament.startTime) {
+                                    return res.status(403).send({ msg: "This tournament has already started" });
+                                } else {
+                                    User.find({ team: user.team })
+                                        .then(players => {
+                                            const notVerifiedPlayers = []
+                                            for (i = 0; i < players.length; i++) {
+                                                if (players[i].faceitVerified == false) {
+                                                    notVerifiedPlayers.push(players[i].username)
+                                                }
+                                            }
+                                            if (notVerifiedPlayers.length > 0) {
+                                                return res.status(403).send({ msg: "One of the players is not verified" + " " + notVerifiedPlayers })
+                                            } else {
+                                                if (players.length < 4) { // players.length < 5
+                                                    return res.status(403).send({ msg: "You must have a full team to join (5 players)" })
+                                                } else {
+
+                                    
+                                                    if (tournament.premium == true) {
+                                                        User.findById(team.owner)
+                                                            .then((owner) => {
+                                                                if (owner.vip == false) {
+                                                                    return res.status(403).send({ msg: "This team leader dont have premium" });
+                                                                } else {
+                                                                    tournament.teams.push(user.team);
+                                                                    res.status(200).send({ msg: "Joined the tournament" })
+                                                                    return tournament.save();
+                                                                }
+                                                            })
+                                                    } else {
+                                                        tournament.teams.push(user.team);
+                                                        res.status(200).send({ msg: "Joined the tournament" })
+                                                        return tournament.save();
+                                                    }
+                                                }
+                                            }
+                                        })
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch((err) => res.status(500).json(err));
+                })
+                .catch((err) => res.status(500).json(err));
     })
         .catch((err) => res.status(500).json(err));
 }

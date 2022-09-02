@@ -82,6 +82,7 @@ exports.findOneUserAndFriends = (req, res) => {
                         .then(data2 => {
                             const { _id, username} = data2
                             names.push({ _id, username })
+                            // console.log(names);
                         })
                 }
                 User.findById(id)
