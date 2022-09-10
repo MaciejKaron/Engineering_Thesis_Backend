@@ -20,8 +20,20 @@ exports.getMyFaceitStats = (req, res) => {
             })
             res.send(curUser)
          }
+            })
+         .catch(err => {
+            res.status(500).send({
+                message:
+                err.message || "Some error while finding faceit stats"
+        })
+    })
       })
-   })
+      .catch(err => {
+         res.status(500).send({
+             message:
+             err.message || "Some error while finding faceit stats"
+     })
+ })
 }
 
 //user game stats from api
@@ -43,8 +55,20 @@ exports.getGameStats = (req, res) => {
                      }
                })  
             }
-         })
-   })
+            })
+            .catch(err => {
+               res.status(500).send({
+                   message:
+                   err.message || "Some error while finding faceit game stats"
+           })
+       })
+      })
+      .catch(err => {
+         res.status(500).send({
+             message:
+             err.message || "Some error while finding faceit game stats"
+     })
+ })
 }
 
 //creata and bind stats with user

@@ -19,6 +19,7 @@ exports.signup = (req, res) => {
     invitations: req.body.invitations,
     friends: req.body.friends,
     faceitNickname: req.body.faceitNickname,
+    faceitAvatar: req.body.faceitAvatar,
     faceitVerified: req.body.faceitVerified ? req.body.faceitVerified : false,
   });
 
@@ -122,6 +123,7 @@ exports.signin = (req, res) => {
         invitations: user.invitations,
         friends: user.friends,
         faceitNickname: user.faceitNickname,
+        faceitAvatar: user.faceitAvatar,
         faceitVerified: user.faceitVerified,
         roles: authorities,
         accessToken: token,
