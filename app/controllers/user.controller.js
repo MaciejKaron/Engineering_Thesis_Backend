@@ -80,8 +80,8 @@ exports.findOneUserAndFriends = (req, res) => {
                 for (i = 0; i < length; i++){
                     User.findById(data.friends[i])
                         .then(data2 => {
-                            const { _id, username} = data2
-                            names.push({ _id, username })
+                            const { _id, username, faceitAvatar} = data2
+                            names.push({ _id, username, faceitAvatar })
                             // console.log(names);
                         })
                 }

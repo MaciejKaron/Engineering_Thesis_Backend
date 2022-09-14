@@ -71,6 +71,41 @@ exports.getGameStats = (req, res) => {
  })
 }
 
+//user player history from api
+exports.getPlayerHistory = (req, res) => {
+   const id = req.params.id
+   User.findById(id)
+      .then(user => {
+         let currentUser = api.nickname(user.faceitNickname)
+            .then(curUser => {
+               if (!currentUser) {
+                  res.status(400).send({message: "Could not find nickname!"})
+               } else {
+                  let currentUserStats = api.players(curUser.player_id, "history")
+                  .then(curUserStats => {
+                     if (!currentUserStats) {
+                        res.status(400).send({ message: "Could not find stats" })
+                     } else {
+                        res.send(curUserStats)
+                     }
+               })  
+            }
+            })
+            .catch(err => {
+               res.status(500).send({
+                   message:
+                   err.message || "Some error while finding faceit game stats"
+           })
+       })
+      })
+      .catch(err => {
+         res.status(500).send({
+             message:
+             err.message || "Some error while finding faceit game stats"
+     })
+ })
+}
+
 //creata and bind stats with user
 exports.getMyAllFaceitStats = (req, res) => {
    const id = req.params.id

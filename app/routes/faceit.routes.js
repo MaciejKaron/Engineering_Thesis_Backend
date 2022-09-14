@@ -14,4 +14,5 @@ module.exports = function (app) {
     app.get('/api/faceit/stats/find/:id', controller.findOneStats)
     app.get('/api/faceit/verified', controller.getVerifiedUsers)
     app.get('/api/faceit/ranking', controller.getRankingStats)
+    app.get('/api/faceit/history/:id', controller.getPlayerHistory)
 }
