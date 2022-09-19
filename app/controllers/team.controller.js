@@ -208,6 +208,18 @@ exports.confirmTeamInvitation = (req, res) => {
                                             User.updateOne({ _id: req.params.id }, { $set: { isInTeam: true } })
                                             .then(() => {
                                             })
+                                            .catch(err => {
+                                                res.status(500).send({
+                                                    message:
+                                                    err.message || "Some error with accept"
+                                            })
+                                        })
+                                        })
+                                        .catch(err => {
+                                            res.status(500).send({
+                                                message:
+                                                err.message || "Some error with accept"
+                                        })
                                     })
                                     res.status(200).send("Joined the team")
                                     return user.save() && currentTeam.save()
@@ -220,7 +232,19 @@ exports.confirmTeamInvitation = (req, res) => {
                         } else {
                             res.status(403).send("You can't accept invitation from yourself")
                     }
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            message:
+                            err.message || "Some error with accept"
+                    })
                 })
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                    err.message || "Some error with accept"
+            })
         })
     } catch (err) {
         res.status(500).send(err)
@@ -241,6 +265,12 @@ exports.declineTeamInvitation = (req, res) => {
                                     User.updateOne({ _id: req.params.id }, { $set: { teamInviteSend: false } })
                                     .then(() => {
                                     })
+                                    .catch(err => {
+                                        res.status(500).send({
+                                            message:
+                                            err.message || "Some error with decline"
+                                    })
+                                })
                                     res.status(200).send("The invitation was rejected")
                                     return user.save() && currentTeam.save()
                                 } else {
@@ -252,7 +282,19 @@ exports.declineTeamInvitation = (req, res) => {
                         } else {
                             res.status(403).send("You can't decline invitation from yourself")
                       }
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            message:
+                            err.message || "Some error with decline"
+                    })
                 })
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                    err.message || "Some error with decline"
+            })
         })
     } catch (err) {
         res.status(500).send(err)
