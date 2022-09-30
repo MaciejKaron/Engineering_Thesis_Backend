@@ -5,6 +5,7 @@ const dbConfig = require("./app/config/db.config")
 const app = express()
 const Faceit = require("faceit-js")
 const api = new Faceit(process.env.FACEIT_API_KEY)
+global.__basedir = __dirname;
 const io = require("socket.io")(8090, {
     cors: {
         origins: ['http://localhost:8081']
@@ -46,6 +47,7 @@ require('./app/routes/message.routes')(app)
 require('./app/routes/notification.routes')(app)
 require('./app/routes/faceit.routes')(app)
 require('./app/routes/payment.routes')(app)
+require('./app/routes/uploadFile.routes')(app)
 
 // **** SOCKET.IO ****
 //set PORT

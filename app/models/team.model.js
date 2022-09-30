@@ -4,6 +4,7 @@ const Team = mongoose.model("Team",
     new mongoose.Schema({
         name: String,
         tag: String,
+        level: String,
         owner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"

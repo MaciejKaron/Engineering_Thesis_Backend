@@ -21,9 +21,11 @@ exports.createTournament = (req, res) => {
         title: req.body.title,
         description: req.body.description,
         mode: req.body.mode,
+        level: req.body.level,
         published: req.body.published ? req.body.published : false,
         premium: req.body.premium ? req.body.premium : false,
         startTime: req.body.startTime,
+        image: req.body.image,
         players: req.body.players,
         teams: req.body.teams,
     })
@@ -171,6 +173,16 @@ exports.addUserToTournament = (req, res) => {
                             return res.status(403).send({ msg: "This user already signed up for this tournament" });
                         }
                         else {
+                            if ((tournament.level == "1-3") && (user.faceitLevel > 3)) {
+                                return  res.status(403).send({ msg: "Your skill level does not meet the requirements"})
+                            } else {
+                                if ((tournament.level == "4-7") && (user.faceitLevel < 4 || user.faceitLevel > 7)) {
+                                    return  res.status(403).send({ msg: "Your skill level does not meet the requirements"})
+                                } else {
+                                    if ((tournament.level == "8-10") && (user.faceitLevel < 8)) {
+                                        return  res.status(403).send({ msg: "Your skill level does not meet the requirements"})
+                                    } else {
+
                             let currentTime = new Date()
                             if (currentTime > tournament.startTime) {
                                 // console.log(currentTime)
@@ -195,8 +207,12 @@ exports.addUserToTournament = (req, res) => {
                                 res.status(200).send({ msg: "Joined the tournament" })
                                 return tournament.save();
                             }
-           
-                        }
+                            
+                                        
+                                    }
+                                }
+                            }
+                        } 
                     }
             })
     })
@@ -235,45 +251,57 @@ exports.addTeamToTournament = (req, res) => {
                                 return res.status(403).send({ msg: "This team already signed up for this tournament" });
                             }
                             else {
-                                let currentTime = new Date()
-                                if (currentTime > tournament.startTime) {
-                                    return res.status(403).send({ msg: "This tournament has already started" });
+                                if ((tournament.level == "1-3") && (team.level >= 4)) {
+                                    return res.status(403).send({ msg: "Your team skill level does not meet the requirements" })
                                 } else {
-                                    User.find({ team: user.team })
-                                        .then(players => {
-                                            const notVerifiedPlayers = []
-                                            for (i = 0; i < players.length; i++) {
-                                                if (players[i].faceitVerified == false) {
-                                                    notVerifiedPlayers.push(players[i].username)
-                                                }
-                                            }
-                                            if (notVerifiedPlayers.length > 0) {
-                                                return res.status(403).send({ msg: "One of the players is not verified" + " " + notVerifiedPlayers })
+                                    if ((tournament.level == "4-7" )&& (team.level < 4 || team.level >= 8)) {
+                                        return res.status(403).send({ msg: "Your team skill level does not meet the requirements" })
+                                    } else {
+                                        if ((tournament.level == "8-10") && (team.level < 8)) {
+                                            return res.status(403).send({ msg: "Your team skill level does not meet the requirements" })
+                                        } else {
+                                            let currentTime = new Date()
+                                            if (currentTime > tournament.startTime) {
+                                                return res.status(403).send({ msg: "This tournament has already started" });
                                             } else {
-                                                if (players.length < 4) { // players.length < 5
-                                                    return res.status(403).send({ msg: "You must have a full team to join (5 players)" })
-                                                } else {
+                                                User.find({ team: user.team })
+                                                    .then(players => {
+                                                        const notVerifiedPlayers = []
+                                                        for (i = 0; i < players.length; i++) {
+                                                            if (players[i].faceitVerified == false) {
+                                                                notVerifiedPlayers.push(players[i].username)
+                                                            }
+                                                        }
+                                                        if (notVerifiedPlayers.length > 0) {
+                                                            return res.status(403).send({ msg: "One of the players is not verified" + " " + notVerifiedPlayers })
+                                                        } else {
+                                                            if (players.length < 5) { // players.length < 5
+                                                                return res.status(403).send({ msg: "You must have a full team to join (5 players)" })
+                                                            } else {
 
                                     
-                                                    if (tournament.premium == true) {
-                                                        User.findById(team.owner)
-                                                            .then((owner) => {
-                                                                if (owner.vip == false) {
-                                                                    return res.status(403).send({ msg: "This team leader dont have premium" });
+                                                                if (tournament.premium == true) {
+                                                                    User.findById(team.owner)
+                                                                        .then((owner) => {
+                                                                            if (owner.vip == false) {
+                                                                                return res.status(403).send({ msg: "This team leader dont have premium" });
+                                                                            } else {
+                                                                                tournament.teams.push(user.team);
+                                                                                res.status(200).send({ msg: "Joined the tournament" })
+                                                                                return tournament.save();
+                                                                            }
+                                                                        })
                                                                 } else {
                                                                     tournament.teams.push(user.team);
                                                                     res.status(200).send({ msg: "Joined the tournament" })
                                                                     return tournament.save();
                                                                 }
-                                                            })
-                                                    } else {
-                                                        tournament.teams.push(user.team);
-                                                        res.status(200).send({ msg: "Joined the tournament" })
-                                                        return tournament.save();
-                                                    }
-                                                }
+                                                            }
+                                                        }
+                                                    })
                                             }
-                                        })
+                                        }
+                                    }
                                 }
                             }
                         }

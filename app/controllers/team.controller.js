@@ -7,6 +7,7 @@ exports.createTeam = (req, res) => {
     const team = new Team({
         name: req.body.name,
         tag: req.body.tag,
+        level: req.body.level,
         owner: req.body.owner,
         players: req.body.players,
         pendingPlayers: req.body.pendingPlayers,
@@ -31,6 +32,26 @@ exports.createTeam = (req, res) => {
     ).catch((err) => {
         res.status(500).send({
             message: err.message || "error while creating team"
+        })
+    })
+}
+
+exports.updateTeam = (req, res) => {
+    if (!req.body) {
+        return res.statsu(400).send({ message: "Data to update can't be empty"})
+    }
+    const id = req.params.id
+    Team.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+        .then(data => {
+            if (!data) {
+            res.status(404).send({ message: `Can't update team with id = ${id}`})
+            } else {
+                res.send({ message: "Team was updated successfully"})
+        }
+        })
+        .catch(err => {
+            res.status(500).send({
+            message: "Error updating team with id=" +id
         })
     })
 }

@@ -8,9 +8,11 @@ module.exports = () => {
             title: String,
             description: String,
             mode: String,
+            level: String,
             published: Boolean,
             premium: Boolean,
             startTime: Date,
+            image: String,
             players: [
                 {
                     type: mongoose.Schema.Types.ObjectId,

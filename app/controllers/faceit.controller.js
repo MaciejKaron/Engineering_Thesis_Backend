@@ -193,7 +193,7 @@ exports.getVerifiedUsers = (req, res) => {
  })
 }
 
-exports.getRankingStats = async (req, res) => {
+exports.getRankingStats = (req, res) => {
    User.find({ faceitVerified: true })
       .then(users => {
          if (!users) {

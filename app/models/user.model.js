@@ -47,6 +47,8 @@ const User = mongoose.model("User",
         faceitNickname: String,
         faceitVerified: Boolean,
         faceitAvatar: String,
+        faceitLevel: String,
+        faceitCountry: String,
     }))
 
     module.exports = User

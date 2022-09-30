@@ -20,6 +20,8 @@ exports.signup = (req, res) => {
     friends: req.body.friends,
     faceitNickname: req.body.faceitNickname,
     faceitAvatar: req.body.faceitAvatar,
+    faceitLevel: req.body.faceitLevel,
+    faceitCountry: req.body.faceitCountry,
     faceitVerified: req.body.faceitVerified ? req.body.faceitVerified : false,
   });
 
@@ -124,6 +126,8 @@ exports.signin = (req, res) => {
         friends: user.friends,
         faceitNickname: user.faceitNickname,
         faceitAvatar: user.faceitAvatar,
+        faceitLevel: user.faceitLevel,
+        faceitCountry: user.faceitCountry,
         faceitVerified: user.faceitVerified,
         roles: authorities,
         accessToken: token,

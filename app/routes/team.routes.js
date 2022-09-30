@@ -16,6 +16,7 @@ module.exports = function (app) {
     app.get('/api/team/get/all', controller.getAllTeams)
     app.delete('/api/team/:id', controller.deleteTeam)
     app.delete('/api/team/delete/all', controller.deleteAllTeams)
+    app.put('/api/team/update/:id', controller.updateTeam)
 
     app.post('/api/team/add/:id', controller.addToPending)
     app.post('/api/team/cancel/:id', controller.removeFromPending)
