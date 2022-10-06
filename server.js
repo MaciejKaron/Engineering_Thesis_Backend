@@ -48,6 +48,7 @@ require('./app/routes/notification.routes')(app)
 require('./app/routes/faceit.routes')(app)
 require('./app/routes/payment.routes')(app)
 require('./app/routes/uploadFile.routes')(app)
+require('./app/routes/match.routes')(app)
 
 // **** SOCKET.IO ****
 //set PORT

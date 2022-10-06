@@ -28,6 +28,7 @@ exports.createTournament = (req, res) => {
         image: req.body.image,
         players: req.body.players,
         teams: req.body.teams,
+        stage: req.body.stage,
     })
     //Save tournament
     tournament.save(tournament).then(
@@ -79,7 +80,7 @@ exports.findAllPublishedTournaments = (req, res) => {
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving tutorials."
+          err.message || "Some error occurred while retrieving tournaments."
       });
     });
 }
@@ -222,6 +223,18 @@ exports.addUserToTournament = (req, res) => {
 exports.leaveUserFromTournament = (req, res) => {
     Tournament.findById(req.params.id)
         .then((tournament) => {
+            if (tournament.stage.stage2.includes(req.body._id)) {
+                tournament.stage.stage2.pull(req.body._id)
+            }
+            if (tournament.stage.stage3.includes(req.body._id)) {
+                tournament.stage.stage3.pull(req.body._id)
+            }
+            if (tournament.stage.stage4.includes(req.body._id)) {
+                tournament.stage.stage4.pull(req.body._id)
+            }
+            if (tournament.stage.stage5.includes(req.body._id)) {
+                tournament.stage.stage5.pull(req.body._id)
+            }
             if (tournament.players.includes(req.body._id)) {
                 tournament.players.pull(req.body._id)
                 res.status(200).send({msg: "Leaved the tournament"})
@@ -326,4 +339,72 @@ exports.leaveTeamFromTournament = (req, res) => {
         }
         })
     .catch((err) => res.status(500).json(err))
+}
+
+exports.goToStage2 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (tournament.stage.stage2.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user already is in stage 2"})
+                    } else {
+                        tournament.stage.stage2.push(req.body._id)
+                        res.status(200).send({ msg: "User added to stage 2" })
+                        return tournament.save()
+                }
+            })
+        })
+        .catch((err) => res.status(500).json(err));
+}
+
+exports.goToStage3 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (tournament.stage.stage3.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user already is in stage 3"})
+                    } else {
+                        tournament.stage.stage3.push(req.body._id)
+                        res.status(200).send({ msg: "User added to stage 3" })
+                        return tournament.save()
+                }
+            })
+        })
+        .catch((err) => res.status(500).json(err));
+}
+
+exports.goToStage4 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (tournament.stage.stage4.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user already is in stage 4"})
+                    } else {
+                        tournament.stage.stage4.push(req.body._id)
+                        res.status(200).send({ msg: "User added to stage 4" })
+                        return tournament.save()
+                }
+            })
+        })
+        .catch((err) => res.status(500).json(err));
+}
+
+exports.goToStage5 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (tournament.stage.stage5.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user already is in stage 5"})
+                    } else {
+                        tournament.stage.stage5.push(req.body._id)
+                        res.status(200).send({ msg: "User added to stage 5" })
+                        return tournament.save()
+                }
+            })
+        })
+        .catch((err) => res.status(500).json(err));
 }

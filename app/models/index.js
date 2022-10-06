@@ -15,6 +15,7 @@ db.conversation = require('./conversation.model')
 db.message = require('./message.model')
 db.notification = require('./notification.model')
 db.faceitStats = require('./faceit.model')
+db.match = require('./match.model')
 
 module.exports = db
 

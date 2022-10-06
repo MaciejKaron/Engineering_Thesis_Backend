@@ -29,4 +29,12 @@ module.exports = function (app) {
     app.post("/api/tournaments/joinTeam/:id", controller.addTeamToTournament)
 
     app.post("/api/tournaments/rejoinTeam/:id", controller.leaveTeamFromTournament)
+
+    app.post("/api/tournaments/stage2/:id", controller.goToStage2)
+
+    app.post("/api/tournaments/stage3/:id", controller.goToStage3)
+
+    app.post("/api/tournaments/stage4/:id", controller.goToStage4)
+
+    app.post("/api/tournaments/stage5/:id", controller.goToStage5)
 }
