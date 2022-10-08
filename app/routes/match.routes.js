@@ -13,4 +13,8 @@ module.exports = function (app) {
     app.get("/api/matches/:id", controller.findMyAllMatches)
 
     app.get("/api/matches/tournament/:id", controller.thisTournamentMatches)
+
+    app.delete("/api/matches/delete/:id", controller.clearThisTournamentMatches)
+
+    app.delete("/api/match/delete/this/:id", controller.deleteThisMatch)
 }

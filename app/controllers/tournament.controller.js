@@ -408,3 +408,71 @@ exports.goToStage5 = (req, res) => {
         })
         .catch((err) => res.status(500).json(err));
 }
+
+exports.backToStage4 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (!tournament.stage.stage5.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user is not in stage 5"})
+                    } else {
+                        tournament.stage.stage5.pull(req.body._id)
+                        res.status(200).send({ msg: "User removed from stage 5" })
+                        return tournament.save()
+                }
+            })
+        })
+    .catch((err) => res.status(500).json(err))
+}
+
+exports.backToStage3 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (!tournament.stage.stage4.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user is not in stage 4"})
+                    } else {
+                        tournament.stage.stage4.pull(req.body._id)
+                        res.status(200).send({ msg: "User removed from stage 4" })
+                        return tournament.save()
+                }
+            })
+        })
+    .catch((err) => res.status(500).json(err))
+}
+
+exports.backToStage2 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (!tournament.stage.stage3.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user is not in stage 3"})
+                    } else {
+                        tournament.stage.stage3.pull(req.body._id)
+                        res.status(200).send({ msg: "User removed from stage 3" })
+                        return tournament.save()
+                }
+            })
+        })
+    .catch((err) => res.status(500).json(err))
+}
+
+exports.backToStage1 = (req, res) => {
+    Tournament.findById(req.params.id)
+        .then((tournament) => {
+            User.findById(req.body._id)
+                .then((user) => {
+                    if (!tournament.stage.stage2.includes(req.body._id)) {
+                    return res.status(403).send({ msg: "This user is not in stage 2"})
+                    } else {
+                        tournament.stage.stage2.pull(req.body._id)
+                        res.status(200).send({ msg: "User removed from stage 2" })
+                        return tournament.save()
+                }
+            })
+        })
+    .catch((err) => res.status(500).json(err))
+}

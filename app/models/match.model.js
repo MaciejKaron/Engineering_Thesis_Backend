@@ -7,12 +7,12 @@ const Match = mongoose.model("Match",
             ref: "Tournament"
         },
         player: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            playerId: mongoose.Schema.Types.ObjectId,
+            playerUsername: String
         },
         opponent: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            opponentId: mongoose.Schema.Types.ObjectId,
+            opponentUsername: String
         },
         playerStats: {
             kills: String,

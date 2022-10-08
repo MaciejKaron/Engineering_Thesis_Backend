@@ -37,4 +37,14 @@ module.exports = function (app) {
     app.post("/api/tournaments/stage4/:id", controller.goToStage4)
 
     app.post("/api/tournaments/stage5/:id", controller.goToStage5)
+
+    app.post("/api/tournaments/remove/stage2/:id", controller.backToStage1)
+
+    app.post("/api/tournaments/remove/stage3/:id", controller.backToStage2)
+
+    app.post("/api/tournaments/remove/stage4/:id", controller.backToStage3)
+
+    app.post("/api/tournaments/remove/stage5/:id", controller.backToStage4)
+
+
 }

@@ -19,7 +19,7 @@ exports.signup = (req, res) => {
     invitations: req.body.invitations,
     friends: req.body.friends,
     faceitNickname: req.body.faceitNickname,
-    faceitAvatar: req.body.faceitAvatar,
+    faceitAvatar: req.body.faceitAvatar ? req.body.faceitAvatar : "",
     faceitLevel: req.body.faceitLevel,
     faceitCountry: req.body.faceitCountry,
     faceitVerified: req.body.faceitVerified ? req.body.faceitVerified : false,
