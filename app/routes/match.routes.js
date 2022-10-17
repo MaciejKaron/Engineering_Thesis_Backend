@@ -10,7 +10,7 @@ module.exports = function (app) {
     })
     app.post("/api/match", controller.createMatch)
 
-    app.get("/api/matches/:id", controller.findMyAllMatches)
+    app.get("/api/matches/user/:id", controller.findMyAllMatches)
 
     app.get("/api/matches/tournament/:id", controller.thisTournamentMatches)
 

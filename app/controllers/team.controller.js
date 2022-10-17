@@ -9,6 +9,7 @@ exports.createTeam = (req, res) => {
         tag: req.body.tag,
         level: req.body.level,
         owner: req.body.owner,
+        ownerAvatar: req.body.ownerAvatar,
         players: req.body.players,
         pendingPlayers: req.body.pendingPlayers,
     })
@@ -153,24 +154,28 @@ exports.addToPending = (req, res) => {
                 .then((user) => {
                     Team.findById(req.body._id)
                         .then((currentTeam) => {
-                            if (currentTeam.owner.toString() !== req.params.id) { // jeśli id usera to nie id założyciela teamu 
-                            if (!currentTeam.players.includes(req.params.id)) { //jeśli nie ma usera w graczach
-                                if (!user.teamInvitations.includes(req.body._id.toString())) { //jeśli user nie dostał wcześniej zaproszenia do teamu
-                                    user.teamInvitations.push(req.body._id)
-                                    currentTeam.pendingPlayers.push(req.params.id)
-                                        User.updateOne({ _id: req.params.id }, { $set: { teamInviteSend: true } })
-                                        .then(() => {
-                                        })
-                                    res.status(200).send("An invitation was send. User has been added to pending") 
-                                    return user.save() && currentTeam.save()
+                            if (currentTeam.players.length < 5) {
+                                if (currentTeam.owner.toString() !== req.params.id) { // jeśli id usera to nie id założyciela teamu 
+                                    if (!currentTeam.players.includes(req.params.id)) { //jeśli nie ma usera w graczach
+                                        if (!user.teamInvitations.includes(req.body._id.toString())) { //jeśli user nie dostał wcześniej zaproszenia do teamu
+                                            user.teamInvitations.push(req.body._id)
+                                            currentTeam.pendingPlayers.push(req.params.id)
+                                            User.updateOne({ _id: req.params.id }, { $set: { teamInviteSend: true } })
+                                                .then(() => {
+                                                })
+                                            res.status(200).send("An invitation was send. User has been added to pending")
+                                            return user.save() && currentTeam.save()
+                                        } else {
+                                            res.status(200).send("You allready send invitation to this user")
+                                        }
+                                    } else {
+                                        res.status(403).send("You allready have this user in team")
+                                    }
                                 } else {
-                                    res.status(200).send("You allready send invitation to this user")
+                                    res.status(403).send("You can't add yourself")
                                 }
                             } else {
-                                res.status(403).send("You allready have this user in team")
-                                }
-                            } else {
-                                res.status(403).send("You can't add yourself")
+                                res.status(403).send("You allready have full team!")
                             }
                     })
             })

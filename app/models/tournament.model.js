@@ -13,6 +13,7 @@ module.exports = () => {
             premium: Boolean,
             startTime: Date,
             image: String,
+            slots: String,
             stage: {
                 stage2: [{type: mongoose.Schema.Types.ObjectId, ref:"User"}],
                 stage3: [{type: mongoose.Schema.Types.ObjectId, ref:"User"}],

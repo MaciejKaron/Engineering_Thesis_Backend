@@ -18,6 +18,18 @@ const Match = mongoose.model("Match",
             kills: String,
             deaths: String,
         },
+        team: {
+            teamId: mongoose.Schema.Types.ObjectId,
+            teamName: String
+        },
+        enemyTeam: {
+            enemyTeamId: mongoose.Schema.Types.ObjectId,
+            enemyTeamName: String
+        },
+        teamRounds: {
+            roundsWin: String,
+            roundsLose: String
+        },
         map: String,
         isWin: Boolean,
     },

@@ -9,6 +9,7 @@ const Team = mongoose.model("Team",
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
+        ownerAvatar: String,
         players: [
             {
                 type: mongoose.Schema.Types.ObjectId,

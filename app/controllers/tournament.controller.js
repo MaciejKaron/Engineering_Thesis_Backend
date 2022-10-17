@@ -26,6 +26,7 @@ exports.createTournament = (req, res) => {
         premium: req.body.premium ? req.body.premium : false,
         startTime: req.body.startTime,
         image: req.body.image,
+        slots: req.body.slots,
         players: req.body.players,
         teams: req.body.teams,
         stage: req.body.stage,
@@ -174,45 +175,49 @@ exports.addUserToTournament = (req, res) => {
                             return res.status(403).send({ msg: "This user already signed up for this tournament" });
                         }
                         else {
+                            if (tournament.players.length >= tournament.slots) {
+                                return res.status(403).send({ msg: "All slots are occupied" })
+                            } else { 
                             if ((tournament.level == "1-3") && (user.faceitLevel > 3)) {
-                                return  res.status(403).send({ msg: "Your skill level does not meet the requirements"})
+                                return res.status(403).send({ msg: "Your skill level does not meet the requirements" })
                             } else {
                                 if ((tournament.level == "4-7") && (user.faceitLevel < 4 || user.faceitLevel > 7)) {
-                                    return  res.status(403).send({ msg: "Your skill level does not meet the requirements"})
+                                    return res.status(403).send({ msg: "Your skill level does not meet the requirements" })
                                 } else {
                                     if ((tournament.level == "8-10") && (user.faceitLevel < 8)) {
-                                        return  res.status(403).send({ msg: "Your skill level does not meet the requirements"})
+                                        return res.status(403).send({ msg: "Your skill level does not meet the requirements" })
                                     } else {
 
-                            let currentTime = new Date()
-                            if (currentTime > tournament.startTime) {
-                                // console.log(currentTime)
-                                // console.log(tournament.startTime)
-                                return res.status(403).send({ msg: "This tournament has already started" });
-                            }
-                            if (tournament.premium == true) {
-                                if (user.vip == false) {
-                                    //  console.log(user.vip) 
-                                    return res.status(403).send({ msg: "This user dont have premium" });
-                                } else {
-                                    tournament.players.push(req.body._id);
-                                    // console.log(req.params.id)
-                                    // console.log(req.body)
-                                    res.status(200).send({ msg: "Joined the tournament" })
-                                    return tournament.save();
-                                }
-                            } else {
-                                tournament.players.push(req.body._id);
-                                // console.log(req.params.id)
-                                // console.log(req.body)
-                                res.status(200).send({ msg: "Joined the tournament" })
-                                return tournament.save();
-                            }
+                                        let currentTime = new Date()
+                                        if (currentTime > tournament.startTime) {
+                                            // console.log(currentTime)
+                                            // console.log(tournament.startTime)
+                                            return res.status(403).send({ msg: "This tournament has already started" });
+                                        }
+                                        if (tournament.premium == true) {
+                                            if (user.vip == false) {
+                                                //  console.log(user.vip) 
+                                                return res.status(403).send({ msg: "This user dont have premium" });
+                                            } else {
+                                                tournament.players.push(req.body._id);
+                                                // console.log(req.params.id)
+                                                // console.log(req.body)
+                                                res.status(200).send({ msg: "Joined the tournament" })
+                                                return tournament.save();
+                                            }
+                                        } else {
+                                            tournament.players.push(req.body._id);
+                                            // console.log(req.params.id)
+                                            // console.log(req.body)
+                                            res.status(200).send({ msg: "Joined the tournament" })
+                                            return tournament.save();
+                                        }
                             
                                         
                                     }
                                 }
                             }
+                        }
                         } 
                     }
             })
@@ -330,6 +335,15 @@ exports.addTeamToTournament = (req, res) => {
 exports.leaveTeamFromTournament = (req, res) => {
     Tournament.findById(req.params.id)
         .then((tournament) => {
+            if (tournament.stage.stage2.includes(req.body._id)) {
+                tournament.stage.stage2.pull(req.body._id)
+            }
+            if (tournament.stage.stage3.includes(req.body._id)) {
+                tournament.stage.stage3.pull(req.body._id)
+            }
+            if (tournament.stage.stage4.includes(req.body._id)) {
+                tournament.stage.stage4.pull(req.body._id)
+            }
             if (tournament.teams.includes(req.body._id)) {
                 tournament.teams.pull(req.body._id)
                 res.status(200).send({msg: "Leaved the tournament"})
@@ -346,12 +360,26 @@ exports.goToStage2 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (tournament.stage.stage2.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user already is in stage 2"})
-                    } else {
-                        tournament.stage.stage2.push(req.body._id)
-                        res.status(200).send({ msg: "User added to stage 2" })
-                        return tournament.save()
+                    if (user) {
+                        if (tournament.stage.stage2.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user already is in stage 2" })
+                        } else {
+                            tournament.stage.stage2.push(req.body._id)
+                            res.status(200).send({ msg: "User added to stage 2" })
+                            return tournament.save()
+                        }
+                    }
+                })
+            Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (tournament.stage.stage2.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This team already is in stage 2"})
+                        } else {
+                            tournament.stage.stage2.push(req.body._id)
+                            res.status(200).send({ msg: "Team added to stage 2" })
+                            return tournament.save()
+                        }
                 }
             })
         })
@@ -363,12 +391,26 @@ exports.goToStage3 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (tournament.stage.stage3.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user already is in stage 3"})
-                    } else {
-                        tournament.stage.stage3.push(req.body._id)
-                        res.status(200).send({ msg: "User added to stage 3" })
-                        return tournament.save()
+                    if (user) {
+                        if (tournament.stage.stage3.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user already is in stage 3" })
+                        } else {
+                            tournament.stage.stage3.push(req.body._id)
+                            res.status(200).send({ msg: "User added to stage 3" })
+                            return tournament.save()
+                        }
+                    }
+                })
+                Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (tournament.stage.stage3.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This team already is in stage 3"})
+                        } else {
+                            tournament.stage.stage3.push(req.body._id)
+                            res.status(200).send({ msg: "Team added to stage 3" })
+                            return tournament.save()
+                        }
                 }
             })
         })
@@ -380,12 +422,26 @@ exports.goToStage4 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (tournament.stage.stage4.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user already is in stage 4"})
-                    } else {
-                        tournament.stage.stage4.push(req.body._id)
-                        res.status(200).send({ msg: "User added to stage 4" })
-                        return tournament.save()
+                    if (user) {
+                        if (tournament.stage.stage4.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user already is in stage 4" })
+                        } else {
+                            tournament.stage.stage4.push(req.body._id)
+                            res.status(200).send({ msg: "User added to stage 4" })
+                            return tournament.save()
+                        }
+                    }
+                })
+                Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (tournament.stage.stage4.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This team already is in stage 4"})
+                        } else {
+                            tournament.stage.stage4.push(req.body._id)
+                            res.status(200).send({ msg: "Team added to stage 4" })
+                            return tournament.save()
+                        }
                 }
             })
         })
@@ -397,12 +453,26 @@ exports.goToStage5 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (tournament.stage.stage5.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user already is in stage 5"})
-                    } else {
-                        tournament.stage.stage5.push(req.body._id)
-                        res.status(200).send({ msg: "User added to stage 5" })
-                        return tournament.save()
+                    if (user) {
+                        if (tournament.stage.stage5.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user already is in stage 5" })
+                        } else {
+                            tournament.stage.stage5.push(req.body._id)
+                            res.status(200).send({ msg: "User added to stage 5" })
+                            return tournament.save()
+                        }
+                    }
+                })
+                Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (tournament.stage.stage5.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This team already is in stage 5"})
+                        } else {
+                            tournament.stage.stage5.push(req.body._id)
+                            res.status(200).send({ msg: "Team added to stage 5" })
+                            return tournament.save()
+                        }
                 }
             })
         })
@@ -414,12 +484,26 @@ exports.backToStage4 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (!tournament.stage.stage5.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user is not in stage 5"})
-                    } else {
-                        tournament.stage.stage5.pull(req.body._id)
-                        res.status(200).send({ msg: "User removed from stage 5" })
-                        return tournament.save()
+                    if (user) {
+                        if (!tournament.stage.stage5.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user is not in stage 5" })
+                        } else {
+                            tournament.stage.stage5.pull(req.body._id)
+                            res.status(200).send({ msg: "User removed from stage 5" })
+                            return tournament.save()
+                        }
+                    }
+                })
+            Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (!tournament.stage.stage5.includes(req.body._id)) {
+                        return res.status(403).send({ msg: "This team is not in stage 5"})
+                        } else {
+                            tournament.stage.stage5.pull(req.body._id)
+                            res.status(200).send({ msg: "Team removed from stage 5" })
+                            return tournament.save()
+                    }
                 }
             })
         })
@@ -431,12 +515,26 @@ exports.backToStage3 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (!tournament.stage.stage4.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user is not in stage 4"})
-                    } else {
-                        tournament.stage.stage4.pull(req.body._id)
-                        res.status(200).send({ msg: "User removed from stage 4" })
-                        return tournament.save()
+                    if (user) {
+                        if (!tournament.stage.stage4.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user is not in stage 4" })
+                        } else {
+                            tournament.stage.stage4.pull(req.body._id)
+                            res.status(200).send({ msg: "User removed from stage 4" })
+                            return tournament.save()
+                        }
+                    }
+                })
+                Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (!tournament.stage.stage4.includes(req.body._id)) {
+                        return res.status(403).send({ msg: "This team is not in stage 4"})
+                        } else {
+                            tournament.stage.stage4.pull(req.body._id)
+                            res.status(200).send({ msg: "Team removed from stage 4" })
+                            return tournament.save()
+                    }
                 }
             })
         })
@@ -448,12 +546,26 @@ exports.backToStage2 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (!tournament.stage.stage3.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user is not in stage 3"})
-                    } else {
-                        tournament.stage.stage3.pull(req.body._id)
-                        res.status(200).send({ msg: "User removed from stage 3" })
-                        return tournament.save()
+                    if (user) {
+                        if (!tournament.stage.stage3.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user is not in stage 3" })
+                        } else {
+                            tournament.stage.stage3.pull(req.body._id)
+                            res.status(200).send({ msg: "User removed from stage 3" })
+                            return tournament.save()
+                        }
+                    }
+                })
+                Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (!tournament.stage.stage3.includes(req.body._id)) {
+                        return res.status(403).send({ msg: "This team is not in stage 3"})
+                        } else {
+                            tournament.stage.stage3.pull(req.body._id)
+                            res.status(200).send({ msg: "Team removed from stage 3" })
+                            return tournament.save()
+                    }
                 }
             })
         })
@@ -465,12 +577,26 @@ exports.backToStage1 = (req, res) => {
         .then((tournament) => {
             User.findById(req.body._id)
                 .then((user) => {
-                    if (!tournament.stage.stage2.includes(req.body._id)) {
-                    return res.status(403).send({ msg: "This user is not in stage 2"})
-                    } else {
-                        tournament.stage.stage2.pull(req.body._id)
-                        res.status(200).send({ msg: "User removed from stage 2" })
-                        return tournament.save()
+                    if (user) {
+                        if (!tournament.stage.stage2.includes(req.body._id)) {
+                            return res.status(403).send({ msg: "This user is not in stage 2" })
+                        } else {
+                            tournament.stage.stage2.pull(req.body._id)
+                            res.status(200).send({ msg: "User removed from stage 2" })
+                            return tournament.save()
+                        }
+                    }
+                })
+                Team.findById(req.body._id)
+                .then((team) => {
+                    if (team) {
+                        if (!tournament.stage.stage2.includes(req.body._id)) {
+                        return res.status(403).send({ msg: "This team is not in stage 2"})
+                        } else {
+                            tournament.stage.stage2.pull(req.body._id)
+                            res.status(200).send({ msg: "Team removed from stage 2" })
+                            return tournament.save()
+                    }
                 }
             })
         })

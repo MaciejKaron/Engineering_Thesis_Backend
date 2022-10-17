@@ -11,16 +11,15 @@ const getPagination = (page, size) => {
 }
 
 exports.createMatch = (req, res) => {
-    //validate request
-    if (!req.body.opponent || !req.body.playerStats || !req.body.map) {
-        res.status(400).send({ message: "Content can not be empty!" })
-        return
-    }
+    
     const match = new Match({
         tournamentId: req.body.tournamentId,
         player: req.body.player,
         opponent: req.body.opponent,
         playerStats: req.body.playerStats,
+        team: req.body.team,
+        enemyTeam: req.body.enemyTeam,
+        teamRounds: req.body.teamRounds,
         map: req.body.map,
         isWin: req.body.isWin
     })
@@ -38,28 +37,25 @@ exports.createMatch = (req, res) => {
 }
 
 exports.findMyAllMatches = (req, res) => {
-    const { page, size } = req.query
-    const { limit, offset } = getPagination(page, size)
     User.findById(req.params.id)
         .then(user => {
-            Match.paginate(req.body.player == user._id, { offset, limit }) 
-                .then(data => {
-                    res.send({
-                        matches: data.docs,
-                        totalItems: data.totalDocs,
-                        totalPages: data.totalPages,
-                        currentPage: data.page -1
-                })
+            Match.find({ 'player.playerId' : user._id })
+                .then(match => {
+                    if (!match) {
+                    res.status(404).send({ message: "Not found user matches"})
+                    } else {
+                        res.send(match)
+                }
                 })
                 .catch(err => {
                     res.status(500).send({
-                    message: err.message || "Some error while retrieving matches "
+                    message: err.message || "Some error while finding this user matches"
                 })
             })
         })
         .catch(err => {
             res.status(500).send({
-            message: err.message || "Some error while finding USER matches"
+            message: err.message || "Some error while finding this user matches"
         })
     })
 }
