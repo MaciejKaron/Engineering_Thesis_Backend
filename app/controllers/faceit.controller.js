@@ -211,10 +211,10 @@ exports.getRankingStats = (req, res) => {
                      }
                   })
                   .catch(err => {
-                     res.status(500).send({
-                         message:
-                         err.message || "Some error while finding nickname"
-                 })
+               //       res.status(400).send({
+               //           message:
+               //           err.message || "Some error while finding nickname"
+               //   })
              })
             }
             api.nickname(users[0].faceitNickname)

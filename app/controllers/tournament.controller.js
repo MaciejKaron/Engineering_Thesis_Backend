@@ -12,7 +12,7 @@ const getPagination = (page, size) => {
 //Create and Save a new tournament
 exports.createTournament = (req, res) => {
 //Validate request
-    if (!req.body.title) {
+    if (!req.body.title || !req.body.mode || !req.body.level || !req.body.startTime) {
         res.status(400).send({ message: "Content can not be empty!" })
         return
     }

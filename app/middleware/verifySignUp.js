@@ -44,9 +44,36 @@ checkRoleExisted = (req, res, next) => {
     next()
 }
 
+badUsername = (req, res, next) => {
+    if (req.body.username.length < 3) {
+        res.status(400).send({ message: "Failed! Username is too short!" })
+        return
+    }
+    next()
+}
+
+badPassword = (req, res, next) => {
+    if (req.body.password.length < 6) {
+        res.status(400).send({ message: "Failed! Password is too short!" })
+        return
+    }
+    next()
+}
+
+badEmail = (req, res, next) => {
+    if (req.body.email.length < 10) {
+        res.status(400).send({ message: "Email is not valid!" })
+        return
+    }
+    next()
+}
+
 const verifySignUp = {
     checkDuplicate,
-    checkRoleExisted
+    checkRoleExisted,
+    badUsername,
+    badPassword,
+    badEmail
 }
 
 module.exports = verifySignUp
